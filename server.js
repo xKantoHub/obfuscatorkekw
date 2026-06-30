@@ -81,7 +81,8 @@ app.post('/obfuscate', async (req, res) => {
   // lua ./cli.lua --preset <preset> <input> --out <output>
   const args = [CLI_PATH, '--preset', chosenPreset, inputFile, '--out', outputFile];
 
-  const child = spawn('lua', args, { cwd: PROMETHEUS_DIR, timeout: 20_000 });
+  const luaBin = process.env.LUA_BIN || 'lua5.1';
+  const child = spawn(luaBin, args, { cwd: PROMETHEUS_DIR, timeout: 20_000 });
 
   let stderr = '';
   child.stderr.on('data', (d) => { stderr += d.toString(); });
