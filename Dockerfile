@@ -1,7 +1,7 @@
 # Dockerfile for Render — Node.js backend + Lua 5.1 + Prometheus obfuscator
 FROM node:18-bullseye-slim
 
-# Install Lua 5.1, LuaRocks, git, and build tools needed by Prometheus
+# Install Lua 5.1 + git
 RUN apt-get update && apt-get install -y --no-install-recommends \
     lua5.1 \
     liblua5.1-0-dev \
@@ -10,8 +10,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Make "lua" point at lua5.1 (Debian installs it as lua5.1, not lua)
-RUN ln -s /usr/bin/lua5.1 /usr/bin/lua
+# Make "lua" point at lua5.1 only if it doesn't already exist
+RUN if [ ! -f /usr/bin/lua ] && [ ! -L /usr/bin/lua ]; then \
+      ln -s /usr/bin/lua5.1 /usr/bin/lua; \
+    fi
+
+# Verify lua works
+RUN lua5.1 -v
 
 WORKDIR /app
 
